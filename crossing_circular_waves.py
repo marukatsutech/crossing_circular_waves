@@ -285,19 +285,19 @@ s_num = tk.Spinbox(
     )
 s_num.pack(side='left')
 
-frm_pattern = ttk.Labelframe(root, relief="ridge", text="Color mode", labelanchor="n", width=100)
-frm_pattern.pack(side='left')
+frm_color_mode = ttk.Labelframe(root, relief="ridge", text="Color mode", labelanchor="n", width=100)
+frm_color_mode.pack(side='left')
 var_color_mode = tk.IntVar(value=color_mode)
-rdb0_pattern = tk.Radiobutton(frm_pattern, text="Mono color", command=change_color_mode,
-                              variable=var_color_mode, value=0)
-rdb1_pattern = tk.Radiobutton(frm_pattern, text="Multi color (Sum of 2 radius is const)", command=change_color_mode,
-                              variable=var_color_mode, value=1)
-rdb2_pattern = tk.Radiobutton(frm_pattern, text="Multi color (Subtraction of 2 radius is const)",
-                              command=change_color_mode, variable=var_color_mode, value=2)
+rdb0_color_mode = tk.Radiobutton(frm_color_mode, text="Mono color", command=change_color_mode,
+                                 variable=var_color_mode, value=0)
+rdb1_color_mode = tk.Radiobutton(frm_color_mode, text="Multi color (Sum of 2 radius is const)",
+                                 command=change_color_mode, variable=var_color_mode, value=1)
+rdb2_color_mode = tk.Radiobutton(frm_color_mode, text="Multi color (Subtraction of 2 radius is const)",
+                                 command=change_color_mode, variable=var_color_mode, value=2)
 
-rdb0_pattern.pack(anchor=tk.W)
-rdb1_pattern.pack(anchor=tk.W)
-rdb2_pattern.pack(anchor=tk.W)
+rdb0_color_mode.pack(anchor=tk.W)
+rdb1_color_mode.pack(anchor=tk.W)
+rdb2_color_mode.pack(anchor=tk.W)
 
 # main loop
 set_axis()
