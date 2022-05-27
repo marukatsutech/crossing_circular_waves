@@ -1,9 +1,10 @@
 # Crossing circular waves with crossing points
-import tkinter
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 import numpy as np
 import matplotlib.patches as patches
+import tkinter as tk
+from tkinter import ttk
 
 
 def set_axis():
@@ -70,19 +71,19 @@ def get_cross_status(d, r0, r1):
                 return 0    # Error
 
 
-def draw_crossing_points(cross_status, p0, r0, p1, r1, d):
+def draw_crossing_points(cross_status, p0, r0, p1, r1, d, col):
     if cross_status == 2:
         cp = circumscribed_point(p0, r0, p1, r1)
-        circle_cp = patches.Circle(xy=cp, radius=cp_r, color="red")
+        circle_cp = patches.Circle(xy=cp, radius=cp_r, color=col)
         ax.add_patch(circle_cp)
     elif cross_status == 3:
         cp = inscribed_point(p0, r0, p1, r1)
-        circle_cp = patches.Circle(xy=cp, radius=cp_r, color="red")
+        circle_cp = patches.Circle(xy=cp, radius=cp_r, color=col)
         ax.add_patch(circle_cp)
     elif cross_status == 6:
         cp0, cp1 = circles_cross_points(p0, r0, p1, r1, d)
-        circle_cp0 = patches.Circle(xy=cp0, radius=cp_r, color="red")
-        circle_cp1 = patches.Circle(xy=cp1, radius=cp_r, color="red")
+        circle_cp0 = patches.Circle(xy=cp0, radius=cp_r, color=col)
+        circle_cp1 = patches.Circle(xy=cp1, radius=cp_r, color=col)
         ax.add_patch(circle_cp0)
         ax.add_patch(circle_cp1)
     else:
@@ -90,20 +91,47 @@ def draw_crossing_points(cross_status, p0, r0, p1, r1, d):
 
 
 def draw_crossing_points_of_circles(c1, c2):
+    col = 'red'
+    c1_cnt = 0  # counter for color
     for i in c1:
         x1 = i[0]
         y1 = i[1]
         r1 = i[2]
+        c1_cnt += 1
+        c2_cnt = 0  # counter for color
         for j in c2:
             x2 = j[0]
             y2 = j[1]
             r2 = j[2]
+            c2_cnt += 1
             point1 = np.array([x1, y1])
             point2 = np.array([x2, y2])
             pv = point2 - point1  # Vector from p1 to p1
             d = np.linalg.norm(pv, 2)  # Norm of vector pv
             cross_status = get_cross_status(d, r1, r2)
-            draw_crossing_points(cross_status, point1, r1, point2, r2, d)
+            if color_mode == 0:
+                color_num = 0
+            elif color_mode == 1:
+                color_num = np.mod(c1_cnt + c2_cnt, 7)
+            else:
+                color_num = np.mod(np.abs(c1_cnt - c2_cnt), 7)
+            if color_num == 0:
+                col = 'red'
+            elif color_num == 1:
+                col = 'orange'
+            elif color_num == 2:
+                col = 'yellow'
+            elif color_num == 3:
+                col = 'green'
+            elif color_num == 4:
+                col = 'blue'
+            elif color_num == 5:
+                col = 'indigo'
+            elif color_num == 6:
+                col = 'blueviolet'
+            else:
+                col = 'gray'
+            draw_crossing_points(cross_status, point1, r1, point2, r2, d, col)
 
 
 def draw_circles(c, col, lst):
@@ -167,6 +195,12 @@ def change_num_circles(value):
     draw_graph()
 
 
+def change_color_mode():
+    global color_mode
+    color_mode = var_color_mode.get()
+    draw_graph()
+
+
 # Global variables
 x_min = -5.
 x_max = 5.
@@ -189,8 +223,10 @@ tolerance = 1 / 1000000
 size_cpr = 0.01        # Radius of crossing points
 cp_r = min([x_max - x_min, y_max - y_min]) * size_cpr   # Radius of crossing points
 
+color_mode = 0
+
 # Generate tkinter
-root = tkinter.Tk()
+root = tk.Tk()
 root.title("Crossing circular waves")
 
 # Generate figure and axes
@@ -199,7 +235,7 @@ ax = fig.add_subplot(1, 1, 1)
 
 # Embed Figure in canvas
 canvas = FigureCanvasTkAgg(fig, root)
-canvas.get_tk_widget().pack()
+canvas.get_tk_widget().pack(expand=True, fill='both')
 
 # Draw circles as initial
 draw_graph()
@@ -209,45 +245,59 @@ toolbar = NavigationToolbar2Tk(canvas, root)
 
 # Label and spinbox to change parameters
 # Distance between 2 points of right and left circles
-label_distance = tkinter.Label(root, text="Distance")
+label_distance = tk.Label(root, text="Distance")
 label_distance.pack(side='left')
-var_d = tkinter.StringVar(root)  # variable for spinbox-value
+var_d = tk.StringVar(root)  # variable for spinbox-value
 var_d.set(distance)  # Initial value
-s_d = tkinter.Spinbox(
+s_d = tk.Spinbox(
     root, textvariable=var_d, format="%.1f", from_=0., to=10., increment=0.5,
     command=lambda: change_distance(var_d.get()), width=5
     )
 s_d.pack(side='left')
 # k
-label_k = tkinter.Label(root, text=" ,k(Wave number)")
+label_k = tk.Label(root, text=" ,k(Wave number)")
 label_k.pack(side='left')
-var_k = tkinter.StringVar(root)  # variable for spinbox-value
+var_k = tk.StringVar(root)  # variable for spinbox-value
 var_k.set(distance)  # Initial value
-s_k = tkinter.Spinbox(
+s_k = tk.Spinbox(
     root, textvariable=var_k, format="%.1f", from_=1., to=10., increment=1.,
     command=lambda: change_k(var_k.get()), width=5
     )
 s_k.pack(side='left')
 # Radius of crossing point dots
-label_cpr = tkinter.Label(root, text=" ,Radius of crossing points")
+label_cpr = tk.Label(root, text=" ,Radius of crossing points")
 label_cpr.pack(side='left')
-var_cpr = tkinter.StringVar(root)  # variable for spinbox-value
+var_cpr = tk.StringVar(root)  # variable for spinbox-value
 var_cpr.set(size_cpr)  # Initial value
-s_cpr = tkinter.Spinbox(
+s_cpr = tk.Spinbox(
     root, textvariable=var_cpr, format="%.3f", from_=0.001, to=0.01, increment=0.001,
     command=lambda: change_radius_crossing_points(var_cpr.get()), width=5
     )
 s_cpr.pack(side='left')
 # Number of circles
-label_num = tkinter.Label(root, text="Number of circles")
+label_num = tk.Label(root, text="Number of circles")
 label_num.pack(side='left')
-var_num = tkinter.IntVar(root)  # variable for spinbox-value
+var_num = tk.IntVar(root)  # variable for spinbox-value
 var_num.set(num_circles)  # Initial value
-s_num = tkinter.Spinbox(
+s_num = tk.Spinbox(
     root, textvariable=var_num, from_=1, to=50, increment=1,
     command=lambda: change_num_circles(var_num.get()), width=4
     )
 s_num.pack(side='left')
+
+frm_pattern = ttk.Labelframe(root, relief="ridge", text="Color mode", labelanchor="n", width=100)
+frm_pattern.pack(side='left')
+var_color_mode = tk.IntVar(value=color_mode)
+rdb0_pattern = tk.Radiobutton(frm_pattern, text="Mono color", command=change_color_mode,
+                              variable=var_color_mode, value=0)
+rdb1_pattern = tk.Radiobutton(frm_pattern, text="Multi color (Sum of 2 radius is const)", command=change_color_mode,
+                              variable=var_color_mode, value=1)
+rdb2_pattern = tk.Radiobutton(frm_pattern, text="Multi color (Subtraction of 2 radius is const)",
+                              command=change_color_mode, variable=var_color_mode, value=2)
+
+rdb0_pattern.pack(anchor=tk.W)
+rdb1_pattern.pack(anchor=tk.W)
+rdb2_pattern.pack(anchor=tk.W)
 
 # main loop
 set_axis()
