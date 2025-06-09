@@ -230,7 +230,7 @@ root = tk.Tk()
 root.title("Crossing circular waves")
 
 # Generate figure and axes
-fig = Figure(figsize=(8, 6))
+fig = Figure()
 ax = fig.add_subplot(1, 1, 1)
 
 # Embed Figure in canvas
